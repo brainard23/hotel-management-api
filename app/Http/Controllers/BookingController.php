@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -28,7 +29,27 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'user_id' => 'required',
+            'room_id' => 'required',
+            'booked_from' => 'required|date',
+            'booked_to' => 'required|date',
+        ]); 
+
+        DB::transaction(function () use ($request){
+            $booking = Booking::firstOrCreate([
+                'user_id' => $request->user_id,
+                'room_id' => $request->room_id,
+                'booked_from' => $request->booked_from,
+                'booked_to' => $request->booked_to
+            ]);
+
+            return response([
+                'message' => 'success',
+                'data' => $booking,
+            ], 200);
+        }); 
+
     }
 
     /**

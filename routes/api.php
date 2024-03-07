@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BuildingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,7 +26,10 @@ Route::group(['prefix'  => 'v1'], function () {
         Route::post('add', [BuildingController::class, 'store']);
         Route::post('update', [BuildingController::class, 'update']);
 
+        Route::post('booking', [BookingController::class, 'store']);
+
     });
+
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
