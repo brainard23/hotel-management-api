@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('room_id')->references('id')->on('rooms')->onDelete('cascade');
-            $table->date('booked_from');
-            $table->date('booked_to');
+            $table->datetime('booked_from');
+            $table->datetime('booked_to');
+            $table->string('status');
             $table->timestamps();
         });
     }

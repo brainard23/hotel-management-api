@@ -16,6 +16,7 @@ class Booking extends Model
         'room_id',
         'booked_from',
         'booked_to',
+        'status',
     ];
 
     public function transactions() 

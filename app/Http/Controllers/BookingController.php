@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -29,26 +31,40 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
+
         $request->validate([
             'user_id' => 'required',
             'room_id' => 'required',
-            'booked_from' => 'required|date',
-            'booked_to' => 'required|date',
+            'booked_from' => 'required|date_format:Y-m-d H:i:s',
+            'booked_to' => 'required|date_format:Y-m-d H:i:s',
         ]); 
 
-        DB::transaction(function () use ($request){
-            $booking = Booking::firstOrCreate([
-                'user_id' => $request->user_id,
-                'room_id' => $request->room_id,
-                'booked_from' => $request->booked_from,
-                'booked_to' => $request->booked_to
-            ]);
+        $isReserved = Room::where('id', $request->room_id)->first();
+        Log::info('Booking' .  $isReserved);
+        if ($isReserved->status !== 'reserved') {
+            DB::transaction(function () use ($request){
+                Booking::firstOrCreate([
+                   'user_id' => $request->user_id,
+                   'room_id' => $request->room_id,
+                   'booked_from' => $request->booked_from,
+                   'booked_to' => $request->booked_to,
+                   'status' => 'pending',
+               ]);
+               
+            
+            }); 
 
+            $isReserved->status = 'reserved';
+            $isReserved->save();
+        } else {
             return response([
-                'message' => 'success',
-                'data' => $booking,
-            ], 200);
-        }); 
+                'message' => 'Room is already reserved',
+            ], 500);
+        }
+        
+        return response([
+            'message' => 'success',
+        ], 200);
 
     }
 
